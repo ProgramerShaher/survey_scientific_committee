@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, InsertSurveyResponse, surveyResponses, surveyAnswers, allowedDashboardUsers, InsertAllowedDashboardUser } from "../drizzle/schema";
+import { InsertUser, users, InsertSurveyResponse, surveyResponses, surveyAnswers, allowedDashboardUsers, InsertAllowedDashboardUser, roles, permissions, rolePermissions } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -245,3 +245,87 @@ export async function removeAllowedDashboardUser(email: string) {
 }
 
 // TODO: add feature queries here as your schema grows.
+
+
+/**
+ * Roles and Permissions Functions
+ */
+
+export async function getRoleWithPermissions(roleId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const role = await db.select().from(roles).where(eq(roles.id, roleId)).limit(1);
+    if (!role.length) return null;
+
+    const perms = await db
+      .select()
+      .from(rolePermissions)
+      .where(eq(rolePermissions.roleId, roleId));
+
+    return { ...role[0], permissions: perms };
+  } catch (error) {
+    console.error("[Database] Failed to get role with permissions:", error);
+    throw error;
+  }
+}
+
+export async function getAllRoles() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    return await db.select().from(roles).where(eq(roles.isActive, true));
+  } catch (error) {
+    console.error("[Database] Failed to get roles:", error);
+    throw error;
+  }
+}
+
+export async function getAllPermissions() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    return await db.select().from(permissions);
+  } catch (error) {
+    console.error("[Database] Failed to get permissions:", error);
+    throw error;
+  }
+}
+
+export async function userHasPermission(email: string, permissionName: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const user = await db
+      .select()
+      .from(allowedDashboardUsers)
+      .where(eq(allowedDashboardUsers.email, email))
+      .limit(1);
+
+    if (!user.length || !user[0].isActive) return false;
+
+    const rolePerms = await db
+      .select()
+      .from(rolePermissions)
+      .where(eq(rolePermissions.roleId, user[0].roleId));
+
+    const permissionIds = rolePerms.map(rp => rp.permissionId);
+
+    const permission = await db
+      .select()
+      .from(permissions)
+      .where(eq(permissions.name, permissionName))
+      .limit(1);
+
+    if (!permission.length) return false;
+
+    return permissionIds.includes(permission[0].id);
+  } catch (error) {
+    console.error("[Database] Failed to check user permission:", error);
+    throw error;
+  }
+}

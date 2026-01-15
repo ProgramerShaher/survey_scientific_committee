@@ -95,7 +95,7 @@ export const appRouter = router({
       .query(async ({ input }) => {
         try {
           const user = await db.isUserAllowedForDashboard(input.email);
-          return { allowed: !!user, role: user?.role || null };
+          return { allowed: !!user, roleId: user?.roleId || null };
         } catch (error) {
           console.error("Failed to check dashboard access:", error);
           throw new TRPCError({
@@ -134,7 +134,7 @@ export const appRouter = router({
         z.object({
           email: z.string().email(),
           name: z.string().min(1),
-          role: z.enum(["admin", "viewer"]),
+          roleId: z.number().int().positive(),
         })
       )
       .mutation(async ({ input }) => {
@@ -142,7 +142,7 @@ export const appRouter = router({
           await db.addAllowedDashboardUser({
             email: input.email,
             name: input.name,
-            role: input.role,
+            roleId: input.roleId,
           });
           return { success: true };
         } catch (error) {
