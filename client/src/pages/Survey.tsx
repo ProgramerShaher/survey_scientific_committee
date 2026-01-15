@@ -18,10 +18,16 @@ import {
   ACADEMIC_LEVELS,
   SURVEY_QUESTIONS,
   getAllSections,
+  SURVEY_TITLE,
+  COMMITTEE_SUPERVISOR,
+  COMMITTEE_SUPERVISOR_ROLE,
 } from "@shared/surveyData";
 import { Star, CheckCircle2 } from "lucide-react";
 
-export default function Survey() {
+const SURVEY_DEVELOPER = "إعداد وتطوير";
+const SURVEY_COORDINATOR = "شاهر خالد اليعري";
+
+function Survey() {
   const [fullName, setFullName] = useState("");
   const [college, setCollege] = useState("");
   const [specialization, setSpecialization] = useState("");
@@ -156,13 +162,13 @@ export default function Survey() {
             </div>
           </div>
           <p className="text-2xl text-gray-700 font-semibold mb-4">
-            جامعة 21 سبتمبر للعلوم الطبية والتطبيقية
+            {SURVEY_TITLE}
           </p>
           <div className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-5 px-8 rounded-2xl inline-block mb-8 shadow-xl">
             <p className="text-2xl font-bold mb-2">
-              تحت إشراف: محمد الحسني
+              تحت إشراف: {COMMITTEE_SUPERVISOR}
             </p>
-            <p className="text-lg font-semibold">مسؤول اللجنة العلمية</p>
+            <p className="text-lg font-semibold">{COMMITTEE_SUPERVISOR_ROLE}</p>
           </div>
           <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
             نرحب بك في استبيان تقييم أداء اللجنة العلمية. رأيك مهم جداً لنا
@@ -282,17 +288,17 @@ export default function Survey() {
                         <p className="text-lg text-gray-800 font-semibold mb-4">
                           {question.text}
                         </p>
-                        <div className="flex gap-3">
+                        <div className="flex gap-2 flex-wrap items-center">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <button
                               key={star}
                               onClick={() =>
                                 handleRating(question.id, star)
                               }
-                              className="transition-all hover:scale-125 active:scale-110"
+                              className="transition-all hover:scale-110 active:scale-100 p-1"
                             >
                               <Star
-                                size={48}
+                                size={36}
                                 className={
                                   star <= (ratings[question.id] || 0)
                                     ? "fill-yellow-400 text-yellow-400 drop-shadow-lg"
@@ -341,10 +347,12 @@ export default function Survey() {
 
         {/* Footer */}
         <div className="text-center bg-gradient-to-r from-slate-900 to-slate-800 text-white py-8 px-8 rounded-2xl shadow-lg">
-          <p className="text-lg font-semibold mb-3">إعداد وتطوير</p>
-          <p className="text-2xl font-bold">شاهر خالد اليعري</p>
+          <p className="text-lg font-semibold mb-3">{SURVEY_DEVELOPER}</p>
+          <p className="text-2xl font-bold">{SURVEY_COORDINATOR}</p>
         </div>
       </div>
     </div>
   );
 }
+
+export default Survey;
