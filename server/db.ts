@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, InsertSurveyResponse, surveyResponses, surveyAnswers } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -87,6 +87,100 @@ export async function getUserByOpenId(openId: string) {
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
 
   return result.length > 0 ? result[0] : undefined;
+}
+
+/**
+ * الاستبيانات - Survey Functions
+ */
+
+export async function createSurveyResponse(
+  data: InsertSurveyResponse & { answers: { questionId: number; rating: number }[] }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    // إنشاء الاستبيان الرئيسي
+    const [result] = await db.insert(surveyResponses).values({
+      fullName: data.fullName,
+      college: data.college,
+      specialization: data.specialization,
+      academicLevel: data.academicLevel,
+      suggestions: data.suggestions,
+    });
+
+    const responseId = result.insertId;
+
+    // إنشاء الإجابات
+    for (const answer of data.answers) {
+      await db.insert(surveyAnswers).values({
+        responseId: responseId as number,
+        questionId: answer.questionId,
+        rating: answer.rating,
+      });
+    }
+
+    return { id: responseId };
+  } catch (error) {
+    console.error("[Database] Failed to create survey response:", error);
+    throw error;
+  }
+}
+
+export async function getAllSurveyResponses() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const responses = await db.select().from(surveyResponses);
+    return responses;
+  } catch (error) {
+    console.error("[Database] Failed to get survey responses:", error);
+    throw error;
+  }
+}
+
+export async function getSurveyResponseWithAnswers(responseId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const response = await db
+      .select()
+      .from(surveyResponses)
+      .where(eq(surveyResponses.id, responseId))
+      .limit(1);
+
+    if (response.length === 0) return null;
+
+    const answersData = await db
+      .select()
+      .from(surveyAnswers)
+      .where(eq(surveyAnswers.responseId, responseId));
+
+    return { ...response[0], answers: answersData };
+  } catch (error) {
+    console.error("[Database] Failed to get survey response with answers:", error);
+    throw error;
+  }
+}
+
+export async function getAnalyticsData() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    // الردود الإجمالية
+    const totalResponses = await db.select().from(surveyResponses);
+
+    // الإجابات
+    const answers = await db.select().from(surveyAnswers);
+
+    return { totalResponses, answers };
+  } catch (error) {
+    console.error("[Database] Failed to get analytics data:", error);
+    throw error;
+  }
 }
 
 // TODO: add feature queries here as your schema grows.

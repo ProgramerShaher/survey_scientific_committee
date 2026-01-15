@@ -25,4 +25,35 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+/**
+ * Survey Responses Table - يحفظ جميع ردود الاستبيانات
+ */
+export const surveyResponses = mysqlTable("survey_responses", {
+  id: int("id").autoincrement().primaryKey(),
+  fullName: varchar("full_name", { length: 255 }).notNull(),
+  college: varchar("college", { length: 255 }).notNull(),
+  specialization: varchar("specialization", { length: 255 }).notNull(),
+  academicLevel: varchar("academic_level", { length: 50 }).notNull(), // أول، ثاني، ثالث، رابع
+  suggestions: text("suggestions"),
+  submittedAt: timestamp("submitted_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type SurveyResponse = typeof surveyResponses.$inferSelect;
+export type InsertSurveyResponse = typeof surveyResponses.$inferInsert;
+
+/**
+ * Survey Answers Table - يحفظ إجابات كل سؤال
+ */
+export const surveyAnswers = mysqlTable("survey_answers", {
+  id: int("id").autoincrement().primaryKey(),
+  responseId: int("response_id")
+    .notNull()
+    .references(() => surveyResponses.id, { onDelete: "cascade" }),
+  questionId: int("question_id").notNull(),
+  rating: int("rating").notNull(), // 1-5 نجوم
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type SurveyAnswer = typeof surveyAnswers.$inferSelect;
+export type InsertSurveyAnswer = typeof surveyAnswers.$inferInsert;
