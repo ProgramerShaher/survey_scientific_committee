@@ -19,7 +19,7 @@ import {
   SURVEY_QUESTIONS,
   getAllSections,
 } from "@shared/surveyData";
-import { Star } from "lucide-react";
+import { Star, CheckCircle2 } from "lucide-react";
 
 export default function Survey() {
   const [fullName, setFullName] = useState("");
@@ -35,7 +35,7 @@ export default function Survey() {
 
   const handleCollegeChange = (value: string) => {
     setCollege(value);
-    setSpecialization(""); // Reset specialization when college changes
+    setSpecialization("");
   };
 
   const handleRating = (questionId: number, rating: number) => {
@@ -46,27 +46,25 @@ export default function Survey() {
   };
 
   const handleSubmit = async () => {
-    // Validation
     if (!fullName.trim()) {
-      toast.error("الرجاء إدخال الاسم الرباعي");
+      toast.error("الرجاء إدخال الاسم الرباعي", { duration: 4000 });
       return;
     }
     if (!college) {
-      toast.error("الرجاء اختيار الكلية");
+      toast.error("الرجاء اختيار الكلية", { duration: 4000 });
       return;
     }
     if (!specialization) {
-      toast.error("الرجاء اختيار التخصص");
+      toast.error("الرجاء اختيار التخصص", { duration: 4000 });
       return;
     }
     if (!academicLevel) {
-      toast.error("الرجاء اختيار المستوى الدراسي");
+      toast.error("الرجاء اختيار المستوى الدراسي", { duration: 4000 });
       return;
     }
 
-    // Check if all questions are rated
     if (Object.keys(ratings).length !== SURVEY_QUESTIONS.length) {
-      toast.error("الرجاء تقييم جميع الأسئلة");
+      toast.error("الرجاء تقييم جميع الأسئلة", { duration: 4000 });
       return;
     }
 
@@ -88,9 +86,8 @@ export default function Survey() {
       });
 
       setSubmitted(true);
-      toast.success("تم إرسال الاستبيان بنجاح");
+      toast.success("تم إرسال الاستبيان بنجاح", { duration: 4000 });
 
-      // Reset form after 3 seconds
       setTimeout(() => {
         setFullName("");
         setCollege("");
@@ -99,9 +96,9 @@ export default function Survey() {
         setSuggestions("");
         setRatings({});
         setSubmitted(false);
-      }, 3000);
+      }, 4000);
     } catch (error) {
-      toast.error("حدث خطأ في إرسال الاستبيان");
+      toast.error("حدث خطأ في إرسال الاستبيان", { duration: 4000 });
       console.error(error);
     } finally {
       setIsSubmitting(false);
@@ -110,31 +107,32 @@ export default function Survey() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4">
-        <Card className="max-w-md w-full p-8 text-center shadow-lg">
-          <div className="mb-6">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-green-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
+        <Card className="max-w-2xl w-full p-12 text-center shadow-2xl bg-white rounded-2xl">
+          <div className="mb-8">
+            <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <CheckCircle2 className="w-12 h-12 text-white" />
             </div>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">
             شكراً لتقييمك
           </h2>
-          <p className="text-gray-600 mb-4">
-            تم إرسال البيانات إلى شاهر خالد اليعري
-          </p>
-          <p className="text-sm text-gray-500">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl mb-6 border border-blue-200">
+            <p className="text-xl text-gray-800 font-semibold mb-3">
+              تم إرسال البيانات إلى:
+            </p>
+            <p className="text-lg text-blue-700 font-bold mb-2">
+              ✓ شاهر خالد اليعري
+            </p>
+            <p className="text-lg text-indigo-700 font-bold">
+              ✓ محمد الحسني
+            </p>
+          </div>
+          <p className="text-gray-600 text-lg mb-2">
             سيتم إعادة توجيهك إلى الصفحة الرئيسية قريباً
+          </p>
+          <p className="text-gray-500 text-sm">
+            شكراً على مساهمتك في تحسين جودة الخدمات
           </p>
         </Card>
       </div>
@@ -146,23 +144,27 @@ export default function Survey() {
     : [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-12 px-4">
+      <div className="max-w-5xl mx-auto">
         {/* Header Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            استبيان تقييم اللجنة العلمية
-          </h1>
-          <p className="text-lg text-gray-600 mb-2">
+        <div className="text-center mb-16">
+          <div className="inline-block mb-6">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-4 rounded-full shadow-lg">
+              <h1 className="text-4xl font-bold text-white">
+                استبيان تقييم اللجنة العلمية
+              </h1>
+            </div>
+          </div>
+          <p className="text-2xl text-gray-700 font-semibold mb-4">
             جامعة 21 سبتمبر للعلوم الطبية والتطبيقية
           </p>
-          <div className="bg-blue-600 text-white py-3 px-6 rounded-lg inline-block mb-6">
-            <p className="text-lg font-semibold">
+          <div className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-5 px-8 rounded-2xl inline-block mb-8 shadow-xl">
+            <p className="text-2xl font-bold mb-2">
               تحت إشراف: محمد الحسني
             </p>
-            <p className="text-sm">مسؤول اللجنة العلمية</p>
+            <p className="text-lg font-semibold">مسؤول اللجنة العلمية</p>
           </div>
-          <p className="text-gray-700 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
             نرحب بك في استبيان تقييم أداء اللجنة العلمية. رأيك مهم جداً لنا
             ويساعدنا على تحسين جودة الخدمات المقدمة. نتطلع إلى تقييمك الصادق
             والموضوعي لجميع جوانب عمل اللجنة.
@@ -170,35 +172,35 @@ export default function Survey() {
         </div>
 
         {/* Form Section */}
-        <Card className="p-8 shadow-lg mb-8">
+        <Card className="p-10 shadow-2xl mb-12 bg-white rounded-3xl border-0">
           {/* Personal Information */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <div className="mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8 pb-4 border-b-4 border-blue-600">
               البيانات الشخصية
             </h2>
 
-            <div className="space-y-6">
+            <div className="space-y-7">
               {/* Full Name */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  الاسم الرباعي
+                <label className="block text-lg font-bold text-gray-800 mb-3">
+                  الاسم الرباعي <span className="text-red-600">*</span>
                 </label>
                 <Input
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="أدخل اسمك الرباعي"
-                  className="w-full"
+                  className="w-full h-12 text-lg rounded-xl border-2 border-gray-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-200"
                 />
               </div>
 
               {/* College */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  الكلية
+                <label className="block text-lg font-bold text-gray-800 mb-3">
+                  الكلية <span className="text-red-600">*</span>
                 </label>
                 <Select value={college} onValueChange={handleCollegeChange}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full h-12 text-lg rounded-xl border-2 border-gray-300 focus:border-blue-600">
                     <SelectValue placeholder="اختر الكلية" />
                   </SelectTrigger>
                   <SelectContent>
@@ -213,15 +215,15 @@ export default function Survey() {
 
               {/* Specialization */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  التخصص
+                <label className="block text-lg font-bold text-gray-800 mb-3">
+                  التخصص <span className="text-red-600">*</span>
                 </label>
                 <Select
                   value={specialization}
                   onValueChange={setSpecialization}
                   disabled={!college}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full h-12 text-lg rounded-xl border-2 border-gray-300 focus:border-blue-600 disabled:bg-gray-100">
                     <SelectValue placeholder="اختر التخصص" />
                   </SelectTrigger>
                   <SelectContent>
@@ -236,11 +238,11 @@ export default function Survey() {
 
               {/* Academic Level */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  المستوى الدراسي
+                <label className="block text-lg font-bold text-gray-800 mb-3">
+                  المستوى الدراسي <span className="text-red-600">*</span>
                 </label>
                 <Select value={academicLevel} onValueChange={setAcademicLevel}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full h-12 text-lg rounded-xl border-2 border-gray-300 focus:border-blue-600">
                     <SelectValue placeholder="اختر المستوى" />
                   </SelectTrigger>
                   <SelectContent>
@@ -256,8 +258,8 @@ export default function Survey() {
           </div>
 
           {/* Survey Questions */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <div className="mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8 pb-4 border-b-4 border-blue-600">
               أسئلة التقييم
             </h2>
 
@@ -266,32 +268,35 @@ export default function Survey() {
                 (q) => q.section === section
               );
               return (
-                <div key={section} className="mb-8">
-                  <h3 className="text-lg font-semibold text-blue-600 mb-4 pb-2 border-b-2 border-blue-200">
+                <div key={section} className="mb-10">
+                  <h3 className="text-2xl font-bold text-blue-700 mb-6 pb-3 border-b-2 border-blue-300">
                     {section}
                   </h3>
 
-                  <div className="space-y-6">
+                  <div className="space-y-7">
                     {sectionQuestions.map((question) => (
-                      <div key={question.id} className="bg-gray-50 p-4 rounded-lg">
-                        <p className="text-gray-800 font-medium mb-3">
+                      <div
+                        key={question.id}
+                        className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border-2 border-blue-200 hover:border-blue-400 transition-colors"
+                      >
+                        <p className="text-lg text-gray-800 font-semibold mb-4">
                           {question.text}
                         </p>
-                        <div className="flex gap-2">
+                        <div className="flex gap-3">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <button
                               key={star}
                               onClick={() =>
                                 handleRating(question.id, star)
                               }
-                              className="transition-transform hover:scale-110"
+                              className="transition-all hover:scale-125 active:scale-110"
                             >
                               <Star
-                                size={32}
+                                size={48}
                                 className={
                                   star <= (ratings[question.id] || 0)
-                                    ? "fill-yellow-400 text-yellow-400"
-                                    : "text-gray-300"
+                                    ? "fill-yellow-400 text-yellow-400 drop-shadow-lg"
+                                    : "text-gray-300 hover:text-yellow-200"
                                 }
                               />
                             </button>
@@ -306,19 +311,19 @@ export default function Survey() {
           </div>
 
           {/* Suggestions */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <div className="mb-10">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8 pb-4 border-b-4 border-blue-600">
               مقترحات التطوير
             </h2>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-lg font-bold text-gray-800 mb-4">
               ما أبرز التطويرات أو التحسينات التي تود للجنة العلمية أن تقوم بها؟
             </label>
             <Textarea
               value={suggestions}
               onChange={(e) => setSuggestions(e.target.value)}
               placeholder="أدخل مقترحاتك وملاحظاتك هنا..."
-              rows={5}
-              className="w-full"
+              rows={6}
+              className="w-full text-lg rounded-2xl border-2 border-gray-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 p-4"
             />
           </div>
 
@@ -327,12 +332,18 @@ export default function Survey() {
             <Button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold rounded-lg"
+              className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 text-xl font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all"
             >
               {isSubmitting ? "جاري الإرسال..." : "إرسال الاستبيان"}
             </Button>
           </div>
         </Card>
+
+        {/* Footer */}
+        <div className="text-center bg-gradient-to-r from-slate-900 to-slate-800 text-white py-8 px-8 rounded-2xl shadow-lg">
+          <p className="text-lg font-semibold mb-3">إعداد وتطوير</p>
+          <p className="text-2xl font-bold">شاهر خالد اليعري</p>
+        </div>
       </div>
     </div>
   );

@@ -57,3 +57,17 @@ export const surveyAnswers = mysqlTable("survey_answers", {
 
 export type SurveyAnswer = typeof surveyAnswers.$inferSelect;
 export type InsertSurveyAnswer = typeof surveyAnswers.$inferInsert;
+
+/**
+ * Allowed Users Table - يحفظ المستخدمين المسموحين بالوصول لوحة التحكم
+ */
+export const allowedDashboardUsers = mysqlTable("allowed_dashboard_users", {
+  id: int("id").autoincrement().primaryKey(),
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull(),
+  role: mysqlEnum("role", ["admin", "viewer"]).default("viewer").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type AllowedDashboardUser = typeof allowedDashboardUsers.$inferSelect;
+export type InsertAllowedDashboardUser = typeof allowedDashboardUsers.$inferInsert;

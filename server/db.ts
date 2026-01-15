@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, InsertSurveyResponse, surveyResponses, surveyAnswers } from "../drizzle/schema";
+import { InsertUser, users, InsertSurveyResponse, surveyResponses, surveyAnswers, allowedDashboardUsers, InsertAllowedDashboardUser } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -170,15 +170,76 @@ export async function getAnalyticsData() {
   if (!db) throw new Error("Database not available");
 
   try {
-    // الردود الإجمالية
     const totalResponses = await db.select().from(surveyResponses);
-
-    // الإجابات
     const answers = await db.select().from(surveyAnswers);
 
     return { totalResponses, answers };
   } catch (error) {
     console.error("[Database] Failed to get analytics data:", error);
+    throw error;
+  }
+}
+
+/**
+ * Dashboard Access Control
+ */
+
+export async function isUserAllowedForDashboard(email: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const result = await db
+      .select()
+      .from(allowedDashboardUsers)
+      .where(eq(allowedDashboardUsers.email, email))
+      .limit(1);
+
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error("[Database] Failed to check dashboard access:", error);
+    throw error;
+  }
+}
+
+export async function getAllowedDashboardUsers() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    return await db.select().from(allowedDashboardUsers);
+  } catch (error) {
+    console.error("[Database] Failed to get allowed users:", error);
+    throw error;
+  }
+}
+
+export async function addAllowedDashboardUser(
+  data: InsertAllowedDashboardUser
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    await db.insert(allowedDashboardUsers).values(data);
+    return { success: true };
+  } catch (error) {
+    console.error("[Database] Failed to add allowed user:", error);
+    throw error;
+  }
+}
+
+export async function removeAllowedDashboardUser(email: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    await db
+      .delete(allowedDashboardUsers)
+      .where(eq(allowedDashboardUsers.email, email));
+    return { success: true };
+  } catch (error) {
+    console.error("[Database] Failed to remove allowed user:", error);
     throw error;
   }
 }

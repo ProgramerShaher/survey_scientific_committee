@@ -6,9 +6,10 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
 import { notifyOwner } from "./_core/notification";
+import { SURVEY_QUESTIONS } from "@shared/surveyData";
+import { generateExcelFile } from "./exportToExcel";
 
 export const appRouter = router({
-  // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -25,10 +26,10 @@ export const appRouter = router({
     submit: publicProcedure
       .input(
         z.object({
-          fullName: z.string().min(1),
-          college: z.string().min(1),
-          specialization: z.string().min(1),
-          academicLevel: z.string().min(1),
+          fullName: z.string().min(1, "الاسم مطلوب"),
+          college: z.string().min(1, "الكلية مطلوبة"),
+          specialization: z.string().min(1, "التخصص مطلوب"),
+          academicLevel: z.string().min(1, "المستوى مطلوب"),
           suggestions: z.string().optional(),
           answers: z.array(
             z.object({
@@ -51,8 +52,8 @@ export const appRouter = router({
 
           // Send email notification
           await notifyOwner({
-            title: "استبيان جديد من الطالب: " + input.fullName,
-            content: `تم استقبال استبيان جديد من ${input.fullName}\nالكلية: ${input.college}\nالتخصص: ${input.specialization}\nالمستوى: ${input.academicLevel}`,
+            title: "استبيان جديد: " + input.fullName,
+            content: `تم استقبال استبيان جديد\n\nالاسم: ${input.fullName}\nالكلية: ${input.college}\nالتخصص: ${input.specialization}\nالمستوى: ${input.academicLevel}\n\nسيتم إرسال البيانات إلى:\nشاهر خالد اليعري\nmohammad.alhosni@example.com`,
           });
 
           return { success: true, id: result.id };
@@ -85,6 +86,97 @@ export const appRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to get analytics",
+        });
+      }
+    }),
+
+    checkDashboardAccess: publicProcedure
+      .input(z.object({ email: z.string().email() }))
+      .query(async ({ input }) => {
+        try {
+          const user = await db.isUserAllowedForDashboard(input.email);
+          return { allowed: !!user, role: user?.role || null };
+        } catch (error) {
+          console.error("Failed to check dashboard access:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to check access",
+          });
+        }
+      }),
+
+    exportToExcel: publicProcedure.query(async () => {
+      try {
+        const { totalResponses, answers } = await db.getAnalyticsData();
+
+        const buffer = generateExcelFile(
+          totalResponses as any,
+          answers as any,
+          SURVEY_QUESTIONS
+        );
+
+        return {
+          success: true,
+          buffer: buffer.toString('base64'),
+          filename: `survey_report_${new Date().toISOString().split('T')[0]}.xlsx`,
+        };
+      } catch (error) {
+        console.error("Failed to export to Excel:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to export data",
+        });
+      }
+    }),
+
+    addAllowedUser: publicProcedure
+      .input(
+        z.object({
+          email: z.string().email(),
+          name: z.string().min(1),
+          role: z.enum(["admin", "viewer"]),
+        })
+      )
+      .mutation(async ({ input }) => {
+        try {
+          await db.addAllowedDashboardUser({
+            email: input.email,
+            name: input.name,
+            role: input.role,
+          });
+          return { success: true };
+        } catch (error) {
+          console.error("Failed to add allowed user:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to add user",
+          });
+        }
+      }),
+
+    removeAllowedUser: publicProcedure
+      .input(z.object({ email: z.string().email() }))
+      .mutation(async ({ input }) => {
+        try {
+          await db.removeAllowedDashboardUser(input.email);
+          return { success: true };
+        } catch (error) {
+          console.error("Failed to remove allowed user:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to remove user",
+          });
+        }
+      }),
+
+    getAllowedUsers: publicProcedure.query(async () => {
+      try {
+        return await db.getAllowedDashboardUsers();
+      } catch (error) {
+        console.error("Failed to get allowed users:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to get users",
         });
       }
     }),
