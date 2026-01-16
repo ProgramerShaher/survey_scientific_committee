@@ -21,6 +21,7 @@ import {
   SURVEY_TITLE,
   COMMITTEE_SUPERVISOR,
   COMMITTEE_SUPERVISOR_ROLE,
+  getAcademicLevelsByCollege,
 } from "@shared/surveyData";
 import { Star, CheckCircle2 } from "lucide-react";
 
@@ -252,7 +253,7 @@ function Survey() {
                     <SelectValue placeholder="اختر المستوى" />
                   </SelectTrigger>
                   <SelectContent>
-                    {ACADEMIC_LEVELS.map((level) => (
+                    {(college ? getAcademicLevelsByCollege(college) : ACADEMIC_LEVELS).map((level) => (
                       <SelectItem key={level} value={level}>
                         {level}
                       </SelectItem>
@@ -346,10 +347,19 @@ function Survey() {
         </Card>
 
         {/* Footer */}
-        <div className="text-center bg-gradient-to-r from-slate-900 to-slate-800 text-white py-8 px-8 rounded-2xl shadow-lg">
-          <p className="text-lg font-semibold mb-3">{SURVEY_DEVELOPER}</p>
-          <p className="text-2xl font-bold">{SURVEY_COORDINATOR}</p>
-        </div>
+        <footer className="bg-gray-900 text-white py-8 mt-16">
+          <div className="max-w-7xl mx-auto px-4 text-center">
+            <p className="mb-2">
+              استبيان تقييم اللجنة العلمية - الملتقى الطلابي بجامعة 21 سبتمبر للعلوم الطبية والتطبيقية
+            </p>
+            <p className="text-gray-400 text-sm">
+              تحت إشراف: محمد الحسني - مسؤول اللجنة العلمية
+            </p>
+            <p className="text-gray-400 text-sm mt-2">
+              تطوير: شاهر خالد اليعري
+            </p>
+          </div>
+        </footer>
       </div>
     </div>
   );

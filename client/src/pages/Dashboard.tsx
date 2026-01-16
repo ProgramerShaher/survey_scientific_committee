@@ -356,6 +356,21 @@ export default function Dashboard() {
           </div>
         </Card>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-8 mt-16">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <p className="mb-2">
+            استبيان تقييم اللجنة العلمية - الملتقى الطلابي بجامعة 21 سبتمبر للعلوم الطبية والتطبيقية
+          </p>
+          <p className="text-gray-400 text-sm">
+            تحت إشراف: محمد الحسني - مسؤول اللجنة العلمية
+          </p>
+          <p className="text-gray-400 text-sm mt-2">
+            تطوير: شاهر خالد اليعري
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

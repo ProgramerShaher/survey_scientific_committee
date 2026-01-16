@@ -36,7 +36,24 @@ export const SPECIALIZATIONS: Record<string, string[]> = {
   "الأسنان": ["طب الأسنان"],
 };
 
-export const ACADEMIC_LEVELS = ["أول", "ثاني", "ثالث", "رابع"];
+export const ACADEMIC_LEVELS = ["أول", "ثاني", "ثالث", "رابع", "امتياز"];
+
+// Get academic levels based on college
+export function getAcademicLevelsByCollege(college: string): string[] {
+  const collegeToLevels: Record<string, string[]> = {
+    "الأسنان": ["أول", "ثاني"],
+    "العلوم الطبية والتطبيقية": ["أول", "ثاني", "ثالث"],
+    "الطب البشري": ["أول", "ثاني", "ثالث", "رابع", "امتياز"],
+    "الطب المخبري": ["أول", "ثاني", "ثالث", "رابع", "امتياز"],
+    "الصيدلة السريرية": ["أول", "ثاني", "ثالث", "رابع", "امتياز"],
+    "التمريض العالي": ["أول", "ثاني", "ثالث", "رابع", "امتياز"],
+    "الهندسة والحاسوب": ["أول", "ثاني", "ثالث", "رابع"],
+    "الإدارة الطبية": ["أول", "ثاني", "ثالث", "رابع"],
+    "المركز الطبي": ["أول", "ثاني", "ثالث", "رابع"],
+  };
+
+  return collegeToLevels[college] || ACADEMIC_LEVELS;
+}
 
 export interface SurveyQuestion {
   id: number;

@@ -2,9 +2,21 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { CheckCircle, BarChart3, Heart } from "lucide-react";
+import { useState } from "react";
+import DashboardLoginModal from "@/components/DashboardLoginModal";
 
 export default function Home() {
   const [, navigate] = useLocation();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  const handleDashboardClick = () => {
+    setIsLoginModalOpen(true);
+  };
+
+  const handleLoginSuccess = () => {
+    setIsLoginModalOpen(false);
+    navigate("/dashboard");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-600 via-blue-50 to-white">
@@ -15,12 +27,17 @@ export default function Home() {
             استبيان اللجنة العلمية
           </h1>
           <Button
-            onClick={() => navigate("/dashboard")}
+            onClick={handleDashboardClick}
             variant="outline"
             className="text-blue-600 border-blue-600 hover:bg-blue-50"
           >
             لوحة التحكم
           </Button>
+          <DashboardLoginModal
+            isOpen={isLoginModalOpen}
+            onClose={() => setIsLoginModalOpen(false)}
+            onSuccess={handleLoginSuccess}
+          />
         </div>
       </nav>
 
@@ -31,7 +48,7 @@ export default function Home() {
             استبيان تقييم اللجنة العلمية
           </h2>
           <p className="text-xl text-gray-600 mb-4">
-            جامعة 21 سبتمبر للعلوم الطبية والتطبيقية
+            الملتقى الطلابي بجامعة 21 سبتمبر للعلوم الطبية والتطبيقية
           </p>
           <div className="bg-blue-600 text-white py-4 px-8 rounded-lg inline-block mb-8">
             <p className="text-lg font-semibold">تحت إشراف: محمد الحسني</p>
@@ -112,7 +129,7 @@ export default function Home() {
                 </li>
                 <li className="flex items-start">
                   <span className="text-blue-600 mr-2">•</span>
-                  <span>دقة وجودة التصخلمات العلمية</span>
+                  <span>دقة وجودة الملخصات العلمية</span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-blue-600 mr-2">•</span>
@@ -168,10 +185,13 @@ export default function Home() {
       <footer className="bg-gray-900 text-white py-8 mt-16">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="mb-2">
-            استبيان تقييم اللجنة العلمية - جامعة 21 سبتمبر
+            استبيان تقييم اللجنة العلمية - الملتقى الطلابي بجامعة 21 سبتمبر للعلوم الطبية والتطبيقية
           </p>
           <p className="text-gray-400 text-sm">
             تحت إشراف: محمد الحسني - مسؤول اللجنة العلمية
+          </p>
+          <p className="text-gray-400 text-sm mt-2">
+            تطوير: شاهر خالد اليعري
           </p>
         </div>
       </footer>
