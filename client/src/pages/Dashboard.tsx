@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import {
@@ -353,6 +353,59 @@ export default function Dashboard() {
                 )}
               </tbody>
             </table>
+          </div>
+        </Card>
+
+        {/* Suggestions Section */}
+        <Card className="p-8 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+            <span className="w-1 h-8 bg-gradient-to-b from-blue-600 to-indigo-600 rounded"></span>
+            اقتراحات وملاحظات الطلاب
+          </h2>
+          <div className="space-y-4">
+            {analyticsData?.totalResponses &&
+            Array.isArray(analyticsData.totalResponses) ? (
+              (analyticsData.totalResponses as SurveyResponse[])
+                .filter((response) => response.suggestions && response.suggestions.trim())
+                .map((response, index) => (
+                  <div
+                    key={response.id}
+                    className="bg-white border-l-4 border-blue-600 p-6 rounded-lg shadow hover:shadow-md transition-shadow"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 pb-4 border-b border-gray-200">
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase">الاسم</p>
+                        <p className="text-gray-900 font-semibold">{response.fullName}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase">الكلية</p>
+                        <p className="text-gray-900 font-semibold">{response.college}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase">التخصص</p>
+                        <p className="text-gray-900 font-semibold">{response.specialization}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase">المستوى</p>
+                        <p className="text-gray-900 font-semibold">{response.academicLevel}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase mb-2">الاقتراح</p>
+                      <p className="text-gray-700 leading-relaxed bg-gray-50 p-4 rounded">
+                        {response.suggestions}
+                      </p>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-3">
+                      التاريخ: {new Date(response.submittedAt).toLocaleDateString("ar-SA")}
+                    </p>
+                  </div>
+                ))
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-gray-500 text-lg">لا توجد اقتراحات حتى الآن</p>
+              </div>
+            )}
           </div>
         </Card>
       </div>
